@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Academicos.Services;
 using iot_webapp.Model;
 
 namespace iot_webapp.Services {

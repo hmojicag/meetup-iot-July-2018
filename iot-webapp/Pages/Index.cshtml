@@ -25,7 +25,7 @@
                 <input type="text" name="Message" class="form-control" id="Message" placeholder="A messgage">
                 <small class="form-text text-muted">16 characters max. No Special Characters</small>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button></br>
+            <button type="submit" class="btn btn-primary">Submit</button><br>
                 <small class="form-text text-muted">The message will be automatically deleted after 30sec or when reaching 10.</small>
         </form>
     </div>
@@ -34,10 +34,14 @@
 
 <div class="row">
     <div class="col-lg-3"></div>
-    <div class="col-lg-6">
+    <div class="col-lg-6 text-center">
         <div id="divMessages" class="alert alert-success" role="alert">
             
         </div>
+        <div id="divTemperature" class="alert alert-info" role="alert">
+            <h1 id="h1Temperature"></h1>
+        </div>
+        <small class="form-text text-muted">This temperature is refreshed every 300ms by the lectures in the Arduino board</small>
     </div>
     <div class="col-lg-3"></div>
 </div>

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Academicos.Services;
 using iot_webapp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +22,7 @@ namespace iot_webapp
             services.AddMvc();
             services.TryAddSingleton<IMessagesService, MessagesService>();
             services.TryAddSingleton<ICensoringService, CensoringService>();
+            services.TryAddSingleton<ITemperatureService, TemperatureService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

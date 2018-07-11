@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace Academicos.Services {
+namespace iot_webapp.Services {
     public class CensoringService : ICensoringService {
         public IList<string> CensoredWords { get; private set; }
  

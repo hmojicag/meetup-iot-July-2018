@@ -2,8 +2,10 @@
 #include <WiFi.h>
 #include <LiquidCrystal.h>
 
-char ssid[] = "java.lang.NullPointerException";     //  your network SSID (name) 
-char pass[] = "ch1l@qu1l3s";    // your network password
+//char ssid[] = "java.lang.NullPointerException";     //  your network SSID (name) 
+//char pass[] = "ch1l@qu1l3s";    // your network password
+char ssid[] = "digitalonus";
+char pass[] = "D1gitalonus";
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 //Maximum 10 messages of 32 characters. Display is 16x2
@@ -28,6 +30,14 @@ WiFiClient client;
 // with the arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+double temperature = 25.0;
+
+unsigned long intervalTempPOST = 500;//POST Temperature each 500ms
+unsigned long intervalGetMsg = 5000;//Get Messages each 5sec
+unsigned long pastMillisTempPOST = 0;
+unsigned long pastMillisGetMsg = 0;
+unsigned long currentMillis = 0;
 
 void setup() {
   //Initialize serial and wait for port to open:
@@ -64,12 +74,38 @@ void setup() {
 }
 
 void loop() {
-  printBanner();
-  requestMessages();
-  delay(1000);
-  waitForResponse();
-  displayMsgs();
-  delay(5000);
+  currentMillis = millis();
+  if((currentMillis - pastMillisGetMsg) >= intervalGetMsg) {
+    printBanner();
+    requestMessages();
+    delay(1000);
+    waitForMessageResponse();
+    displayMsgs();
+    pastMillisGetMsg = currentMillis;
+  }
+
+  if((currentMillis - pastMillisTempPOST) >= intervalTempPOST) {
+    //postTempData();
+    Serial.println(":D temp posting");
+    pastMillisTempPOST = currentMillis;
+  }
+}
+
+void postTempData() {
+  Serial.println("\nStarting connection to server to post temp..");
+  // if you get a connection, report back via serial:
+  if (client.connect(server, 80)) {
+    Serial.println("connected to server");
+    // Make a HTTP request:
+    client.println("POST /api/temp HTTP/1.1");
+    client.println("Host: digitalonus.academicos.com.mx");
+    client.println("Connection: close");
+    client.println();
+    client.print("temperature=");
+    client.println(temperature);
+  } else {
+    Serial.println("ERROR connecting to server");
+  }
 }
 
 void printBanner() {
@@ -86,7 +122,7 @@ void requestMessages() {
   if (client.connect(server, 80)) {
     Serial.println("connected to server");
     // Make a HTTP request:
-    client.println("GET /api/json-iot HTTP/1.1");
+    client.println("GET /api/iot-msg HTTP/1.1");
     client.println("Host: digitalonus.academicos.com.mx");
     client.println("Connection: close");
     client.println();
@@ -95,7 +131,7 @@ void requestMessages() {
   }
 }
 
-void waitForResponse() {
+void waitForMessageResponse() {
   isRequestBody = false;
   lastCharReceived = 0;
   i = 0;
