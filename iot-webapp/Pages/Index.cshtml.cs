@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Academicos.Services;
 using iot_webapp.Model;
 using iot_webapp.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace iot_webapp.Pages {
     public class IndexModel : PageModel {
 
-        private IMessagesService _messagesService;
+        private readonly IMessagesService _messagesService;
         
         [BindProperty]
         [Required(ErrorMessage = "Name is required")]
