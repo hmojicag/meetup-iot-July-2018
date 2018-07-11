@@ -17,7 +17,7 @@ int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
 //IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
-char server[] = "academicos.com.mx";    // name address for Google (using DNS)
+char server[] = "digitalonus.academicos.com.mx";    // name address for Google (using DNS)
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -86,8 +86,8 @@ void requestMessages() {
   if (client.connect(server, 80)) {
     Serial.println("connected to server");
     // Make a HTTP request:
-    client.println("GET /msg.txt HTTP/1.1");
-    client.println("Host: academicos.com.mx");
+    client.println("GET /api/json-iot HTTP/1.1");
+    client.println("Host: digitalonus.academicos.com.mx");
     client.println("Connection: close");
     client.println();
   } else {
@@ -142,12 +142,20 @@ void enqueueResponse() {
 
 void displayMsgs() {
   k = 0;
+
+  if (msgQueue[0] == '\0') {
+    //No messages
+    lcd.clear();
+    lcd.print("No Msg new msg");
+    return;
+  }
+  
   while (true) {
-    displayMsg();
-    delay(3000);
     if (k >= 320 || msgQueue[k] == '\0') {
       break;
     }
+    displayMsg();
+    delay(3000);
   }
   
   blankMsgQueue();
@@ -161,7 +169,7 @@ void displayMsg() {
   while (true) {
     c = msgQueue[k];
     k++;
-    if (c == ':') {
+    if (c == ';' || c == '\0' || c == ':') {
       break;
     }
     lcd.print(c);
@@ -183,7 +191,7 @@ void displayMsg() {
 
 void blankMsgQueue() {
   for (int j = 0; j < 320; j++) {
-    msgQueue[i] = '\0';//null all
+    msgQueue[j] = '\0';//null all
   }
 }
 
