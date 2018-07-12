@@ -2,10 +2,10 @@
 #include <WiFi.h>
 #include <LiquidCrystal.h>
 
-//char ssid[] = "java.lang.NullPointerException";     //  your network SSID (name) 
-//char pass[] = "ch1l@qu1l3s";    // your network password
-char ssid[] = "digitalonus";
-char pass[] = "D1gitalonus";
+char ssid[] = "java.lang.NullPointerException";     //  your network SSID (name) 
+char pass[] = "ch1l@qu1l3s";    // your network password
+//char ssid[] = "digitalonus";
+//char pass[] = "D1gitalonus";
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 //Maximum 10 messages of 32 characters. Display is 16x2
@@ -31,9 +31,9 @@ WiFiClient client;
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-double temperature = 25.0;
+float temperature = 25.0;
 
-unsigned long intervalTempPOST = 500;//POST Temperature each 500ms
+unsigned long intervalTempPOST = 50;//POST Temperature each 300ms
 unsigned long intervalGetMsg = 5000;//Get Messages each 5sec
 unsigned long pastMillisTempPOST = 0;
 unsigned long pastMillisGetMsg = 0;
@@ -85,8 +85,7 @@ void loop() {
   }
 
   if((currentMillis - pastMillisTempPOST) >= intervalTempPOST) {
-    //postTempData();
-    Serial.println(":D temp posting");
+    postTempData();
     pastMillisTempPOST = currentMillis;
   }
 }
@@ -96,15 +95,43 @@ void postTempData() {
   // if you get a connection, report back via serial:
   if (client.connect(server, 80)) {
     Serial.println("connected to server");
+
+    //Get Temperature from LM35
+    int bits = analogRead(0);
+    temperature = (bits * 500) / 1024.0; //ºC
+
+    String content = "temperature=" + String(temperature,1);
+    String contentHeader = "Content-Length: " + String(content.length());
+    Serial.println(content);
+    Serial.println(contentHeader);
+    
     // Make a HTTP request:
     client.println("POST /api/temp HTTP/1.1");
     client.println("Host: digitalonus.academicos.com.mx");
+    client.println(contentHeader);
+    client.println("Content-Type: application/x-www-form-urlencoded");
     client.println("Connection: close");
     client.println();
-    client.print("temperature=");
-    client.println(temperature);
+    client.println(content);
   } else {
     Serial.println("ERROR connecting to server");
+  }
+
+  while(true) {
+    // if there are incoming bytes available
+    // from the server, read them and print them
+    while (client.available()) {
+      char c = client.read();
+      Serial.write(c);
+    }
+
+    // if the server's disconnected, stop the client
+    if (!client.connected()) {
+      Serial.println();
+      Serial.println("Disconnecting from server...");
+      client.stop();
+      break;
+    }
   }
 }
 
